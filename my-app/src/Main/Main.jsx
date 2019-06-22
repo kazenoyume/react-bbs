@@ -59,12 +59,12 @@ export class Main extends Component {
             comments: [],
             submitting: false,
             value: '',
-            name:(storage.name) ? storage.name : 'guest',
+            name:(storage.getItem('name')) ? storage.getItem('name') : 'guest',
             loading: false,
-            imageUrl:(storage.imageUrl) ? storage.imageUrl:'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png'
+            imageUrl:(storage.getItem('imageUrl')) ? storage.getItem('imageUrl'):'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png'
         };
-        if(storage.comments){
-            let comment =JSON.parse(storage.comments)
+        if(storage.getItem('comments')){
+            let comment =JSON.parse(storage.getItem('comments'))
             comment.forEach(obj=>{
                 const du = moment.duration(moment(obj.time) - moment(), 'ms').humanize() + ' ago';
                 this.state.comments.push(contentObj(obj.author,obj.avatar,obj.content.props.children,du,obj.time))
@@ -74,7 +74,7 @@ export class Main extends Component {
     };
 
       func = () =>{
-        let comment =JSON.parse(storage.comments)
+        let comment =JSON.parse(storage.getItem('comments'))
         let newArray =[];
         comment.forEach(obj=>{ 
             const du = moment.duration(moment(obj.time) - moment(), 'ms').humanize() + ' ago';
@@ -111,7 +111,7 @@ export class Main extends Component {
               ...this.state.comments,
             ],
           });
-          storage.comments=JSON.stringify(this.state.comments)
+          storage.setItem('comments',JSON.stringify(this.state.comments))
         }, 1000);
         
       };
@@ -123,7 +123,7 @@ export class Main extends Component {
       };
 
       handleChangeName = e => {
-        storage.name=e.target.value;
+        storage.setItem('name',e.target.value)
         this.setState({
             name: e.target.value,
         });
@@ -137,7 +137,7 @@ export class Main extends Component {
         if (info.file.status === 'done') {
           // Get this url from response in real world.
           getBase64(info.file.originFileObj, imageUrl =>{
-            storage.imageUrl=imageUrl;
+            storage.setItem('imageUrl',imageUrl)
             this.setState({
                 imageUrl,
                 loading: false,
