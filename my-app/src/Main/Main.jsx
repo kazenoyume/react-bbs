@@ -4,36 +4,16 @@ import { Comment, Avatar, Form, Button, List, Input, Upload, Icon, Tooltip} from
 import moment from 'moment';
 
 import './styles/Main.css';
+import { Editor } from '../Editor';
+import { CommentList } from '../CommentList';
 
-const { TextArea } = Input;
-const CommentList = ({ comments }) => (
-    <List
-      dataSource={comments}
-      header={`${comments.length} ${comments.length > 1 ? 'replies' : 'reply'}`}
-      itemLayout="horizontal"
-      renderItem={props => <Comment {...props} />}
-    />
-  );
-  
-const Editor = ({ onChange,onChangeName, onSubmit, submitting, value, name }) => (
-<div className='Input-field'>
-    <Form.Item>
-    <Input placeholder="enter your name"  onChange={onChangeName} value={name} />
-    <TextArea rows={4} onChange={onChange} value={value} />
-    </Form.Item>
-    <Form.Item>
-    <Button htmlType="submit" loading={submitting} onClick={onSubmit} type="primary">
-        Add Comment
-    </Button>
-    </Form.Item>
-</div>
-);
 
 const getBase64 = (img, callback) => {
     const reader = new FileReader();
     reader.addEventListener('load', () => callback(reader.result));
     reader.readAsDataURL(img);
 }
+
 const contentObj =(author, avatar, content, datetime, time)=>{
     console.log(time)
     return   {
@@ -46,7 +26,6 @@ const contentObj =(author, avatar, content, datetime, time)=>{
         </Tooltip>,
         time: time
     }
-
 }
    
 
@@ -152,8 +131,6 @@ export class Main extends Component {
         let { comments, submitting, value ,name, imageUrl} = this.state;
         return (
           <div className='Main'>
-         
-   
               <Comment
               avatar={
                 <Upload
@@ -170,7 +147,6 @@ export class Main extends Component {
                 />}
                 </Upload>
               }
-              
               content={
                 <Editor  
                   onChange={this.handleChange}
