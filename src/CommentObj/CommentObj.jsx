@@ -49,7 +49,15 @@ export class CommentObj extends Component {
             <Comment id={content.id} 
             author={content.author}
             avatar = {content.avatar}
-            content= {(content.onLoading) ?  <Skeleton active={true} /> : (content.isEdit) ?<div><TextArea defaultValue={content.content} autosize onChange={this.onTextChange}  /><br></br> <a onClick = {this.onsave.bind(this, content.id)}>save</a></div>  :<div>{content.content}<br></br> <a onClick = {this.onmodify.bind(this, content.id)}>modify</a></div>}
+            content= {(content.onLoading) ?  <Skeleton active={true} /> 
+                     : (content.isEdit) ?
+                     <div>
+                        <TextArea defaultValue={content.content} autosize onChange={this.onTextChange}  />
+                        <br></br><a onClick = {this.onsave.bind(this, content.id)}>save</a>
+                    </div> :
+                    <div>
+                        {content.content}<br></br> <a onClick = {this.onmodify.bind(this, content.id)}>modify</a>
+                     </div>}
             datetime={ <div><Tooltip title={content.time}> <span>{content.datetime}</span> </Tooltip><Popconfirm title="Are you sure delete this?"  onConfirm={this.ondelete.bind(this, content.id)} okText="Yes" cancelText="No"> <a>Delete</a> </Popconfirm></div> } 
             time={content.time} 
             ></Comment>
