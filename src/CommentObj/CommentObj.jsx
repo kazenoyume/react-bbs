@@ -4,7 +4,9 @@ import { Comment, List , Input ,Tooltip, Skeleton, Popconfirm} from 'antd';
 
 import { MainContext } from '../Main/context'
 const { TextArea } = Input;
-
+const contentObject=()=>{
+    
+}
 export class CommentObj extends Component {
     static contextType = MainContext
     state = {
