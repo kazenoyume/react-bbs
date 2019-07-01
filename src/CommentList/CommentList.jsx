@@ -1,26 +1,27 @@
+import React, { Component } from "react";
+import { List } from "antd";
 
-import React, { Component } from 'react';
-import {List} from 'antd';
-
-import { CommentObj } from '../CommentObj';
-import { AppContext } from '../App/context'
+import { CommentObj } from "../CommentObj";
+import { AppContext } from "../App/context";
 export class CommentList extends Component {
-    static contextType = AppContext
-    componentDidMount(){
-        const { onPeopleCountChange }= this.context
-        onPeopleCountChange && onPeopleCountChange(this.props.comments)
-    }
+  static contextType = AppContext;
+  componentDidMount() {
+    const { onPeopleCountChange } = this.context;
+    onPeopleCountChange && onPeopleCountChange(this.props.comments);
+  }
 
-    render() {
-        let { comments }= this.props;
-            
-        return (
-          <List
-          dataSource={comments}
-          header={`${comments.length} ${comments.length > 1 ? 'replies' : 'reply'}`}
-          itemLayout="horizontal"
-          renderItem={obj=> <CommentObj comment={obj} />}
-        />
-        );
-    }
+  render() {
+    let { comments } = this.props;
+
+    return (
+      <List
+        dataSource={comments}
+        header={`${comments.length} ${
+          comments.length > 1 ? "replies" : "reply"
+        }`}
+        itemLayout="horizontal"
+        renderItem={obj => <CommentObj comment={obj} />}
+      />
+    );
+  }
 }
