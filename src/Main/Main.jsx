@@ -76,7 +76,8 @@ export class Main extends Component {
     }
   }
 
-  setCommentLoadingDone = () => {
+  setCommentLoadingDone = (time) => {
+
     setTimeout(() => {
       this.state.comments.forEach(obj => {
         obj.onLoading = false;
@@ -84,7 +85,7 @@ export class Main extends Component {
       this.setState({
         comments: this.state.comments
       });
-    }, 1000);
+    }, time||1000);
   };
 
   handleSubmit = () => {
@@ -122,7 +123,7 @@ export class Main extends Component {
       const { onPeopleCountChange } = this.context;
       onPeopleCountChange && onPeopleCountChange(this.state.comments);
     }, 1000);
-    this.setCommentLoadingDone();
+    this.setCommentLoadingDone(2000);
   };
 
   handleChange = e => {
@@ -188,7 +189,7 @@ export class Main extends Component {
       comments: this.state.comments
     });
     storage.setItem("comments", JSON.stringify(this.state.comments));
-    this.setCommentLoadingDone(this.state.comments);
+    this.setCommentLoadingDone();
   };
 
   render() {
