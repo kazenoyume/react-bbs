@@ -65,7 +65,7 @@ export class Main extends Component {
           this.setState({
             comments: this.state.comments,
           });
-        },3000);
+        },1000);
       }
       
 
