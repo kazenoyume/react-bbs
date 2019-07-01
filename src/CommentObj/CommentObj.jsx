@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import { Comment, List , Input ,Tooltip, Skeleton} from 'antd';
+import { Comment, List , Input ,Tooltip, Skeleton, Popconfirm} from 'antd';
 
 import { MainContext } from '../Main/context'
 const { TextArea } = Input;
@@ -8,7 +8,6 @@ const { TextArea } = Input;
 export class CommentObj extends Component {
     static contextType = MainContext
     state = {
-        loading: true,
         editMsg:'',
       }
       
@@ -46,15 +45,16 @@ export class CommentObj extends Component {
         }
     render() {
         let { content } = this.props;
-        const { loading } = this.state
         return (
             <Comment id={content.id} 
             author={content.author}
             avatar = {content.avatar}
-            content= {(loading) ?  <Skeleton active={true} /> : (content.isEdit) ?<div><TextArea defaultValue={content.content} autosize onChange={this.onTextChange}  /><br></br> <a onClick = {this.onsave.bind(this, content.id)}>save</a></div>  :<div>{content.content}<br></br> <a onClick = {this.onmodify.bind(this, content.id)}>modify</a></div>}
-            datetime={ <div><Tooltip title={content.time}> <span>{content.datetime}</span> </Tooltip> <a  onClick = {this.ondelete.bind(this, content.id)}>delete</a></div> } 
+            content= {(content.onLoading) ?  <Skeleton active={true} /> : (content.isEdit) ?<div><TextArea defaultValue={content.content} autosize onChange={this.onTextChange}  /><br></br> <a onClick = {this.onsave.bind(this, content.id)}>save</a></div>  :<div>{content.content}<br></br> <a onClick = {this.onmodify.bind(this, content.id)}>modify</a></div>}
+            datetime={ <div><Tooltip title={content.time}> <span>{content.datetime}</span> </Tooltip><Popconfirm title="Are you sure delete this?"  onConfirm={this.ondelete.bind(this, content.id)} okText="Yes" cancelText="No"> <a>Delete</a> </Popconfirm></div> } 
             time={content.time} 
             ></Comment>
         );
+
+        
     }
 }

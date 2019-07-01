@@ -12,8 +12,7 @@ const { TextArea } = Input;
 
 export class App extends Component {
     state = {
-      peopleCount: 0,
-
+      peopleCount: 0
     }
     
     render() {
@@ -23,15 +22,13 @@ export class App extends Component {
           <div className="App">
             <div className="App-header">
               <img src={logo} className="App-logo" alt="logo" />
-              <span>{peopleCount}人</span>
+              <span>馬的留言人數：{peopleCount}人</span>
             </div>
             <div className="App-body">
             <AppContext.Provider
               value={{
-                peopleCount: 1234,
-                onPeopleCountChange: this.setPeopleCountChange,
-                test:44444444444
-
+                peopleCount: 0,
+                onPeopleCountChange: this.setPeopleCountChange
                 
               }}
             >
@@ -45,6 +42,7 @@ export class App extends Component {
         );
         
     }
+
     setPeopleCountChange = comment => {
       const set1 = new Set();
       comment.forEach(obj=>{ 

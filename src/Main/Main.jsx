@@ -3,6 +3,8 @@ import React, { Component } from 'react';
 import { Comment, Avatar, Form, Button, List, Input, Upload, Icon, Tooltip} from 'antd';
 import moment from 'moment';
 import uuidv1 from 'uuid/v1';
+import _ from 'underscore'
+
 import './styles/Main.css';
 import { Editor } from '../Editor';
 import { CommentList } from '../CommentList';
@@ -15,7 +17,7 @@ const getBase64 = (img, callback) => {
     reader.readAsDataURL(img);
 }
 
-const contentObj =(id,author, avatar, content, datetime, time,isEdit)=>{
+const contentObj =(id,author, avatar, content, datetime, time,isEdit,onLoading)=>{
     return   {
         id:id,
         author: author,
@@ -23,7 +25,8 @@ const contentObj =(id,author, avatar, content, datetime, time,isEdit)=>{
         content: content,
         datetime: datetime,
         isEdit:isEdit||false,
-        time: time
+        time: time,
+        onLoading:onLoading||false
     }
     
 }
@@ -36,37 +39,34 @@ export class Main extends Component {
       constructor(props){
         super(props);
         this.state = {
+            loading:false,
             comments: [],
             submitting: false,
             value: '',
             name:(storage.getItem('name')) ? storage.getItem('name') : 'guest',
-            loading: false,
             imageUrl:(storage.getItem('imageUrl')) ? storage.getItem('imageUrl'):'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png'
         };
         if(storage.getItem('comments')){
             let comment =JSON.parse(storage.getItem('comments'))
             comment.forEach(obj=>{
-                const du = moment.duration(moment(obj.time) - moment(), 'ms').humanize() + ' ago';
-                this.state.comments.push(contentObj(obj.id,obj.author,obj.avatar,obj.content,du,obj.time,false))
+              console.log(obj.time,moment(obj.time).format('YYYY-MM-DD HH:mm:ss'));
+                const du = moment.duration(moment(obj.time) - moment().unix(), 'ms').humanize() + ' ago';
+                this.state.comments.push(contentObj(obj.id,obj.author,obj.avatar,obj.content,du,obj.time,false,true))
             });
+            this.setCommentLoadingDone()
         }
-        setInterval(this.func,60000);
       };
 
-      func = () =>{
-        let comment =JSON.parse(storage.getItem('comments'))
-        let newArray =[];
-        comment.forEach(obj=>{ 
-            const du = moment.duration(moment(obj.time) - moment(), 'ms').humanize() + ' ago';
-            newArray.push(
-                contentObj(obj.id,obj.author,obj.avatar,obj.content,du,obj.time,obj.isEdit)
-            )
-        });
-        this.setState({
-            comments:newArray
-        });
-        
-      };
+      setCommentLoadingDone = ()=>{
+        setTimeout(() => {
+          this.state.comments.forEach(obj=>{
+              obj.onLoading = false;
+          });
+          this.setState({
+            comments: this.state.comments,
+          });
+        },3000);
+      }
       
 
       handleSubmit = () => {
@@ -87,14 +87,16 @@ export class Main extends Component {
             submitting: false,
             value: '',
             comments: [
-               contentObj(uuidv1(),this.state.name, this.state.imageUrl,this.state.value,moment().fromNow(),moment().format("YYYY-MM-DD HH:mm:SS"), false),
+               contentObj(uuidv1(),this.state.name, this.state.imageUrl,this.state.value,moment().fromNow(),moment().unix(), false,true),
               ...this.state.comments,
             ],
           });
+          console.log(this.state.comments);
           storage.setItem('comments',JSON.stringify(this.state.comments))
           const { onPeopleCountChange } = this.context
           onPeopleCountChange && onPeopleCountChange(this.state.comments)
         }, 1000);
+        this.setCommentLoadingDone();
         
       };
     
@@ -131,8 +133,6 @@ export class Main extends Component {
 
       handleDelete = id => {
         let commentList = this.state.comments
-
-        
         let newArray =[]
         this.state.comments.forEach(obj=>{ 
           if(obj.id != id){
@@ -146,7 +146,7 @@ export class Main extends Component {
         this.setState({
           comments: newArray,
         });
-       
+        storage.setItem('comments',JSON.stringify(newArray))
         const { onPeopleCountChange } = this.context
         onPeopleCountChange && onPeopleCountChange(newArray)
       };
@@ -168,18 +168,18 @@ export class Main extends Component {
       };
 
       handleSave = (id,editMsg) => {
-        let commentList = this.state.comments
-
         this.state.comments.forEach(obj=>{ 
           if(obj.id == id){
             obj.content = editMsg;
             obj.isEdit =false;
+            obj.onLoading =true;
           }
         });
         this.setState({
           comments: this.state.comments,
-        });
-
+        });  
+        storage.setItem('comments',JSON.stringify(this.state.comments))
+        this.setCommentLoadingDone(this.state.comments);
       };
 
       render() {
