@@ -2,11 +2,12 @@
 import React, { Component } from 'react';
 import { Comment, Avatar, Form, Button, List, Input, Upload, Icon, Tooltip} from 'antd';
 import moment from 'moment';
-
+import uuidv1 from 'uuid/v1';
 import './styles/Main.css';
 import { Editor } from '../Editor';
 import { CommentList } from '../CommentList';
-
+import { AppContext } from '../App/context'
+import { MainContext } from './context'
 
 const getBase64 = (img, callback) => {
     const reader = new FileReader();
@@ -14,24 +15,24 @@ const getBase64 = (img, callback) => {
     reader.readAsDataURL(img);
 }
 
-const contentObj =(author, avatar, content, datetime, time)=>{
-    console.log(time)
+const contentObj =(id,author, avatar, content, datetime, time,isEdit)=>{
     return   {
+        id:id,
         author: author,
         avatar: avatar,
-        content: <p>{content}</p>,
-        datetime: 
-        <Tooltip title={time}>
-            <span>{datetime}</span>
-        </Tooltip>,
+        content: content,
+        datetime: datetime,
+        isEdit:isEdit||false,
         time: time
     }
+    
 }
    
 
 
 let storage=window.localStorage;
 export class Main extends Component {
+      static contextType = AppContext
       constructor(props){
         super(props);
         this.state = {
@@ -46,7 +47,7 @@ export class Main extends Component {
             let comment =JSON.parse(storage.getItem('comments'))
             comment.forEach(obj=>{
                 const du = moment.duration(moment(obj.time) - moment(), 'ms').humanize() + ' ago';
-                this.state.comments.push(contentObj(obj.author,obj.avatar,obj.content.props.children,du,obj.time))
+                this.state.comments.push(contentObj(obj.id,obj.author,obj.avatar,obj.content,du,obj.time,false))
             });
         }
         setInterval(this.func,60000);
@@ -58,7 +59,7 @@ export class Main extends Component {
         comment.forEach(obj=>{ 
             const du = moment.duration(moment(obj.time) - moment(), 'ms').humanize() + ' ago';
             newArray.push(
-                contentObj(obj.author,obj.avatar,obj.content.props.children,du,obj.time)
+                contentObj(obj.id,obj.author,obj.avatar,obj.content,du,obj.time,obj.isEdit)
             )
         });
         this.setState({
@@ -86,11 +87,13 @@ export class Main extends Component {
             submitting: false,
             value: '',
             comments: [
-               contentObj(this.state.name, this.state.imageUrl,this.state.value,moment().fromNow(),moment().format("YYYY-MM-DD HH:mm:SS")),
+               contentObj(uuidv1(),this.state.name, this.state.imageUrl,this.state.value,moment().fromNow(),moment().format("YYYY-MM-DD HH:mm:SS"), false),
               ...this.state.comments,
             ],
           });
           storage.setItem('comments',JSON.stringify(this.state.comments))
+          const { onPeopleCountChange } = this.context
+          onPeopleCountChange && onPeopleCountChange(this.state.comments)
         }, 1000);
         
       };
@@ -107,7 +110,6 @@ export class Main extends Component {
             name: e.target.value,
         });
       };
-
       handleChangeImg = info => {
         if (info.file.status === 'uploading') {
           this.setState({ loading: true });
@@ -126,7 +128,60 @@ export class Main extends Component {
           );
         }
       };
-    
+
+      handleDelete = id => {
+        let commentList = this.state.comments
+
+        
+        let newArray =[]
+        this.state.comments.forEach(obj=>{ 
+          if(obj.id != id){
+            newArray.push(
+              obj
+            )
+          }
+          
+         
+        });
+        this.setState({
+          comments: newArray,
+        });
+       
+        const { onPeopleCountChange } = this.context
+        onPeopleCountChange && onPeopleCountChange(newArray)
+      };
+
+      handleEdit = id => {
+        let commentList = this.state.comments
+
+        this.state.comments.forEach(obj=>{ 
+          if(obj.id == id){
+            obj.isEdit =true;
+          }else{
+            obj.isEdit =false;
+          }
+        });
+        this.setState({
+          comments: this.state.comments,
+        });
+
+      };
+
+      handleSave = (id,editMsg) => {
+        let commentList = this.state.comments
+
+        this.state.comments.forEach(obj=>{ 
+          if(obj.id == id){
+            obj.content = editMsg;
+            obj.isEdit =false;
+          }
+        });
+        this.setState({
+          comments: this.state.comments,
+        });
+
+      };
+
       render() {
         let { comments, submitting, value ,name, imageUrl} = this.state;
         return (
@@ -158,8 +213,15 @@ export class Main extends Component {
                 />
               }
             />
+            <MainContext.Provider
+              value={{
+                onEdit: this.handleEdit,
+                onDelete: this.handleDelete,
+                onSave :this.handleSave
+              }}
+            >
             {comments.length > 0 && <CommentList comments={comments} />}
-            
+            </MainContext.Provider>
           </div>
         );
       }
