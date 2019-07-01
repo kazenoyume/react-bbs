@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Input } from 'antd';
 
 import logo from './logo.svg';
 import './App.css';
@@ -8,7 +7,6 @@ import './App.css';
 import { Main } from '../Main';
 import { AppContext } from './context'
 
-const { TextArea } = Input;
 
 export class App extends Component {
     state = {

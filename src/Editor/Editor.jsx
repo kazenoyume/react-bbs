@@ -1,10 +1,8 @@
 
 import React, { Component } from 'react';
-import { Comment, Avatar, Form, Button, List, Input, Upload, Icon, Tooltip} from 'antd';
-import moment from 'moment';
+import { Form, Button, Input} from 'antd';
 
 const { TextArea } = Input;
-let storage=window.localStorage;
 export class Editor extends Component {
       handleChange = e => {
         this.props.onChange(e);

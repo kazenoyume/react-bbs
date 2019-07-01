@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import { Comment, Avatar, Form, Button, List, Input, Upload, Icon, Tooltip} from 'antd';
+import { Comment, Avatar, Upload, Icon} from 'antd';
 import moment from 'moment';
 import uuidv1 from 'uuid/v1';
 import _ from 'underscore'
@@ -49,7 +49,6 @@ export class Main extends Component {
         if(storage.getItem('comments')){
             let comment =JSON.parse(storage.getItem('comments'))
             comment.forEach(obj=>{
-              console.log(obj.time,moment(obj.time).format('YYYY-MM-DD HH:mm:ss'));
                 const du = moment.duration(moment(obj.time) - moment().unix(), 'ms').humanize() + ' ago';
                 this.state.comments.push(contentObj(obj.id,obj.author,obj.avatar,obj.content,du,obj.time,false,true))
             });
@@ -91,7 +90,6 @@ export class Main extends Component {
               ...this.state.comments,
             ],
           });
-          console.log(this.state.comments);
           storage.setItem('comments',JSON.stringify(this.state.comments))
           const { onPeopleCountChange } = this.context
           onPeopleCountChange && onPeopleCountChange(this.state.comments)
@@ -132,16 +130,9 @@ export class Main extends Component {
       };
 
       handleDelete = id => {
-        let commentList = this.state.comments
         let newArray =[]
         this.state.comments.forEach(obj=>{ 
-          if(obj.id != id){
-            newArray.push(
-              obj
-            )
-          }
-          
-         
+          (obj.id !== id)&&newArray.push(obj)
         });
         this.setState({
           comments: newArray,
@@ -152,24 +143,17 @@ export class Main extends Component {
       };
 
       handleEdit = id => {
-        let commentList = this.state.comments
-
         this.state.comments.forEach(obj=>{ 
-          if(obj.id == id){
-            obj.isEdit =true;
-          }else{
-            obj.isEdit =false;
-          }
+          obj.isEdit = (obj.id === id)?true:false;
         });
         this.setState({
           comments: this.state.comments,
         });
-
       };
 
       handleSave = (id,editMsg) => {
         this.state.comments.forEach(obj=>{ 
-          if(obj.id == id){
+          if(obj.id === id){
             obj.content = editMsg;
             obj.isEdit =false;
             obj.onLoading =true;
