@@ -99,11 +99,8 @@ export class Main extends Component {
     if (info.file.status === 'done') {
       // Get this url from response in real world.
       getBase64(info.file.originFileObj, imageUrl => {
-        storage.setItem('imageUrl', imageUrl);
-        this.setState({
-          imageUrl,
-          loading: false
-        });
+          storage.setItem('imageUrl', imageUrl);
+          this.setState({ imageUrl, loading: false});
       });
     }
   };
@@ -147,7 +144,7 @@ export class Main extends Component {
   };
 
   render() {
-    let { comments, submitting, value, name, imageUrl, loading} = this.state;
+    const { comments, submitting, value, name, imageUrl, loading} = this.state;
     return (
       <div className='Main'>
         <Comment

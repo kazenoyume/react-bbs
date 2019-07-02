@@ -12,36 +12,34 @@ export class CommentObj extends Component {
     ...this.context
   };
 
-  ondelete = id => this.state.onDelete &&  this.state.onDelete(id);
-  onmodify = (id, content) => ((this.state.onEdit &&  this.state.onEdit(id)),(this.setState({ editMsg: content })));
-  onsave = id => this.state.onSave && this.state.onSave(id, this.state.editMsg);
-  onTextChange = ({target:{value}}) => this.setState({ editMsg: value });
-  displayTime = time =>`${moment.duration(moment(time) - moment().unix(), "seconds").humanize()} ago`;
+  ondelete      = id => this.state.onDelete &&  this.state.onDelete(id);
+  onmodify      = (id, content) => ((this.state.onEdit &&  this.state.onEdit(id)),(this.setState({ editMsg: content })));
+  onsave        = id => this.state.onSave && this.state.onSave(id, this.state.editMsg);
+  onTextChange  = ({target:{value}}) => this.setState({ editMsg: value });
+  displayTime   = time =>`${moment.duration(moment(time) - moment().unix(), "seconds").humanize()} ago`;
 
   render() {
-    let { comment } = this.props;
-    let { editMsg } = this.state;
+    const { comment:{ id, author, avatar, onLoading, isEdit, content, time} } = this.props;
+    const { editMsg } = this.state;
     return (
       <Comment
-        id={comment.id}
-        author={comment.author}
-        avatar={comment.avatar}
+        id={id}
+        author={author}
+        avatar={avatar}
         content={
-          comment.onLoading ? (
+          onLoading ? (
             <Skeleton active={true} />
-          ) : comment.isEdit ? (
+          ) : isEdit ? (
             <div className="Input-field">
               <TextArea rows={4} value={editMsg} onChange={this.onTextChange} />
               <br />
-              <a onClick={this.onsave.bind(this, comment.id)}>save</a>
+              <a onClick={this.onsave.bind(this, id)}>save</a>
             </div>
           ) : (
             <div style={{ whiteSpace: "pre-wrap" }}>
-              {comment.content}
+              {content}
               <br />{" "}
-              <a
-                onClick={this.onmodify.bind(this, comment.id, comment.content)}
-              >
+              <a onClick={this.onmodify.bind(this, id, content)} >
                 modify
               </a>
             </div>
@@ -49,13 +47,13 @@ export class CommentObj extends Component {
         }
         datetime={
           <div>
-            <Tooltip title={comment.time}>
+            <Tooltip title={time}>
               {" "}
-              <span>{this.displayTime(comment.time)}</span>{" "}
+              <span>{this.displayTime(time)}</span>{" "}
             </Tooltip>
             <Popconfirm
               title="Are you sure delete this?"
-              onConfirm={this.ondelete.bind(this, comment.id)}
+              onConfirm={this.ondelete.bind(this, id)}
               okText="Yes"
               cancelText="No"
             >
@@ -64,7 +62,7 @@ export class CommentObj extends Component {
             </Popconfirm>
           </div>
         }
-        time={comment.time}
+        time={time}
       />
     );
   }

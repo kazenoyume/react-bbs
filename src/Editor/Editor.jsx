@@ -3,18 +3,11 @@ import { Form, Button, Input } from "antd";
 
 const { TextArea } = Input;
 export class Editor extends Component {
-  handleChange = e => {
-    this.props.onChange(e);
-  };
-  handleChangeName = e => {
-    this.props.onChangeName(e);
-  };
-  handleSubmit = e => {
-    this.props.onSubmit(e);
-  };
-
+  handleChange = e =>  this.props.onChange(e);
+  handleChangeName = e => this.props.onChangeName(e);
+  handleSubmit = e => this.props.onSubmit(e);
   render() {
-    let { submitting, value, name } = this.props;
+    const { submitting, value, name } = this.props;
     return (
       <div className="Input-field">
         <Form.Item>
