@@ -5,10 +5,7 @@ import { CommentObj } from "../CommentObj";
 import { AppContext } from "../App/context";
 export class CommentList extends Component {
   static contextType = AppContext;
-  componentDidMount() {
-    const { onPeopleCountChange } = this.context;
-    onPeopleCountChange && onPeopleCountChange(this.props.comments);
-  }
+
 
   render() {
     let { comments } = this.props;

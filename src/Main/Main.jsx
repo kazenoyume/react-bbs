@@ -41,10 +41,11 @@ export class Main extends Component {
         comments: comment
       });
       this.setCommentLoadingDone(3000);
+      const { onPeopleCountChange } = this.context;
+      onPeopleCountChange && onPeopleCountChange(comment);
     }
+  
   }
-
-
   setCommentLoadingDone = (time) => 
     setTimeout(time => {
         this.state.comments.forEach(obj => {
