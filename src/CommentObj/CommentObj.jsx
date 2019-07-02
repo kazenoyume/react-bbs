@@ -10,7 +10,7 @@ export class CommentObj extends Component {
     editMsg: ""
   };
 
-  ondelete = id => {
+  ondelete(id){
     const { onDelete } = this.context;
     onDelete && onDelete(id);
   };

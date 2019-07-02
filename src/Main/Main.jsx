@@ -41,44 +41,45 @@ const contentObj = (
 let storage = window.localStorage;
 export class Main extends Component {
   static contextType = AppContext;
-  constructor(props) {
-    super(props);
-    this.state = {
-      loading: false,
-      comments: [],
-      submitting: false,
-      value: "",
-      name: storage.getItem("name") ? storage.getItem("name") : "guest",
-      imageUrl: storage.getItem("imageUrl")
-        ? storage.getItem("imageUrl")
-        : "https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-    };
+  state = {
+    loading: false,
+    comments: [],
+    submitting: false,
+    value: "",
+    name: storage.getItem("name") ? storage.getItem("name") : "guest",
+    imageUrl: storage.getItem("imageUrl")
+      ? storage.getItem("imageUrl")
+      : "https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+  };
+
+
+  componentDidMount() {
     if (storage.getItem("comments")) {
       let comment = JSON.parse(storage.getItem("comments"));
       comment.forEach(obj => {
-        const du =
-          moment.duration(moment(obj.time) - moment().unix(), "ms").humanize() +
-          " ago";
         this.state.comments.push(
           contentObj(
             obj.id,
             obj.author,
             obj.avatar,
             obj.content,
-            du,
+            `${moment.duration(moment(obj.time) - moment().unix(), "ms").humanize()} ago`,
             obj.time,
             false,
             true
           )
         );
       });
-      this.setCommentLoadingDone();
+      this.setState({
+        comments: this.state.comments
+      });
+      this.setCommentLoadingDone(3000);
     }
   }
 
-  setCommentLoadingDone = (time) => {
 
-    setTimeout(() => {
+  setCommentLoadingDone = (time) => {
+    setTimeout(time => {
       this.state.comments.forEach(obj => {
         obj.onLoading = false;
       });
@@ -89,18 +90,13 @@ export class Main extends Component {
   };
 
   handleSubmit = () => {
+    const { onPeopleCountChange } = this.context;
     if (!this.state.value) {
       return;
-    }
-    if (!this.state.name) {
-      this.setState({
-        name: "guest"
-      });
     }
     this.setState({
       submitting: true
     });
-
     setTimeout(() => {
       this.setState({
         submitting: false,
@@ -108,7 +104,7 @@ export class Main extends Component {
         comments: [
           contentObj(
             uuidv1(),
-            this.state.name,
+            this.state.name||'guest',
             this.state.imageUrl,
             this.state.value,
             moment().fromNow(),
@@ -120,24 +116,20 @@ export class Main extends Component {
         ]
       });
       storage.setItem("comments", JSON.stringify(this.state.comments));
-      const { onPeopleCountChange } = this.context;
       onPeopleCountChange && onPeopleCountChange(this.state.comments);
+      this.setCommentLoadingDone();
     }, 1000);
-    this.setCommentLoadingDone(2000);
   };
 
-  handleChange = e => {
+  handleChange = ({target:{value}}) =>  (this.setState({ value: value })) ;
+
+  handleChangeName = ({target:{value}}) => {
+    storage.setItem("name", value);
     this.setState({
-      value: e.target.value
+      name: value
     });
   };
 
-  handleChangeName = e => {
-    storage.setItem("name", e.target.value);
-    this.setState({
-      name: e.target.value
-    });
-  };
   handleChangeImg = info => {
     if (info.file.status === "uploading") {
       this.setState({ loading: true });
@@ -178,11 +170,12 @@ export class Main extends Component {
   };
 
   handleSave = (id, editMsg) => {
-    this.state.comments.forEach(obj => {
+    this.state.comments.every(obj => {
       if (obj.id === id) {
         obj.content = editMsg;
         obj.isEdit = false;
         obj.onLoading = true;
+        return false
       }
     });
     this.setState({

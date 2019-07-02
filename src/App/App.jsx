@@ -22,7 +22,6 @@ export class App extends Component {
         <div className="App-body">
           <AppContext.Provider
             value={{
-              peopleCount: 0,
               onPeopleCountChange: this.setPeopleCountChange
             }}
           >
