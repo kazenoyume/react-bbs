@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Comment, Input, Tooltip, Skeleton, Popconfirm } from "antd";
+import moment from "moment";
 
 import { MainContext } from "../Main/context";
 const { TextArea } = Input;
@@ -8,13 +9,14 @@ export class CommentObj extends Component {
   static contextType = MainContext;
   state = {
     editMsg: "",
-    ... this.context
+    ...this.context
   };
 
   ondelete = id => this.state.onDelete &&  this.state.onDelete(id);
   onmodify = (id, content) => ((this.state.onEdit &&  this.state.onEdit(id)),(this.setState({ editMsg: content })));
   onsave = id => this.state.onSave && this.state.onSave(id, this.state.editMsg);
   onTextChange = ({target:{value}}) => this.setState({ editMsg: value });
+  displayTime = time =>`${moment.duration(moment(time) - moment().unix(), "seconds").humanize()} ago`;
 
   render() {
     let { comment } = this.props;
@@ -49,7 +51,7 @@ export class CommentObj extends Component {
           <div>
             <Tooltip title={comment.time}>
               {" "}
-              <span>{comment.datetime}</span>{" "}
+              <span>{this.displayTime(comment.time)}</span>{" "}
             </Tooltip>
             <Popconfirm
               title="Are you sure delete this?"

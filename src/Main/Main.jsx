@@ -1,40 +1,21 @@
-import React, { Component } from "react";
-import { Comment, Avatar, Upload, Icon } from "antd";
-import moment from "moment";
-import uuidv1 from "uuid/v1";
-import _ from "underscore";
+import React, { Component } from 'react';
+import { Comment, Avatar, Upload, Icon } from 'antd';
+import moment from 'moment';
+import uuidv1 from 'uuid/v1';
+import _ from 'underscore';
 
-import "./styles/Main.css";
-import { Editor } from "../Editor";
-import { CommentList } from "../CommentList";
-import { AppContext } from "../App/context";
-import { MainContext } from "./context";
+import './styles/Main.css';
+import { Editor } from '../Editor';
+import { CommentList } from '../CommentList';
+import { AppContext } from '../App/context';
+import { MainContext } from './context';
 
 const getBase64 = (img, callback) => {
   const reader = new FileReader();
-  reader.addEventListener("load", () => callback(reader.result));
+  reader.addEventListener('load', () => callback(reader.result));
   reader.readAsDataURL(img);
 };
 
-const contentObj = (
-  id,
-  author,
-  avatar,
-  content,
-  datetime,
-  time,
-  isEdit,
-  onLoading
-) => ({
-    id: id,
-    author: author,
-    avatar: avatar,
-    content: content,
-    datetime: datetime,
-    isEdit: isEdit || false,
-    time: time,
-    onLoading: onLoading || false
-  });
 
 
 const storage = window.localStorage;
@@ -44,33 +25,20 @@ export class Main extends Component {
     loading: false,
     comments: [],
     submitting: false,
-    value: "",
-    name: storage.getItem("name") ? storage.getItem("name") : "guest",
-    imageUrl: storage.getItem("imageUrl")
-      ? storage.getItem("imageUrl")
-      : "https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+    value: '',
+    name: storage.getItem('name') || 'guest',
+    imageUrl: storage.getItem('imageUrl') || 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png'
   };
 
 
   componentDidMount() {
-    if (storage.getItem("comments")) {
-      let comment = JSON.parse(storage.getItem("comments"));
+    if (storage.getItem('comments')) {
+      let comment = JSON.parse(storage.getItem('comments'));
       comment.forEach(obj => {
-        this.state.comments.push(
-          contentObj(
-            obj.id,
-            obj.author,
-            obj.avatar,
-            obj.content,
-            `${moment.duration(moment(obj.time) - moment().unix(), "seconds").humanize()} ago`,
-            obj.time,
-            false,
-            true
-          )
-        );
+        obj.onLoading =true;
       });
       this.setState({
-        comments: this.state.comments
+        comments: comment
       });
       this.setCommentLoadingDone(3000);
     }
@@ -99,39 +67,38 @@ export class Main extends Component {
     setTimeout(() => {
       this.setState({
         submitting: false,
-        value: "",
+        value: '',
         comments: [
-          contentObj(
-            uuidv1(),
-            this.state.name||'guest',
-            this.state.imageUrl,
-            this.state.value,
-            moment().fromNow(),
-            moment().unix(),
-            false,
-            true
-          ),
+          {
+            id:  uuidv1(),
+            author: this.state.name||'guest',
+            avatar: this.state.imageUrl,
+            content:  this.state.value,
+            isEdit: false,
+            time: moment().unix(),
+            onLoading:true
+          },
           ...this.state.comments
         ]
       });
-      storage.setItem("comments", JSON.stringify(this.state.comments));
+      storage.setItem('comments', JSON.stringify(this.state.comments));
       onPeopleCountChange && onPeopleCountChange(this.state.comments);
       this.setCommentLoadingDone();
     }, 1000);
   };
 
   handleChange = ({target:{value}}) =>  this.setState({ value: value }) ;
-  handleChangeName = ({target:{value}}) => ((storage.setItem("name", value)),( this.setState({ name: value })))
+  handleChangeName = ({target:{value}}) => ((storage.setItem('name', value)),( this.setState({ name: value })))
  
   handleChangeImg = info => {
-    if (info.file.status === "uploading") {
+    if (info.file.status === 'uploading') {
       this.setState({ loading: true });
       return;
     }
-    if (info.file.status === "done") {
+    if (info.file.status === 'done') {
       // Get this url from response in real world.
       getBase64(info.file.originFileObj, imageUrl => {
-        storage.setItem("imageUrl", imageUrl);
+        storage.setItem('imageUrl', imageUrl);
         this.setState({
           imageUrl,
           loading: false
@@ -142,16 +109,15 @@ export class Main extends Component {
 
   handleDelete = id => {
     const { onPeopleCountChange } = this.context;
-    let newArray = [];
+    let comments = [];
     this.state.comments.forEach(obj => {
-      obj.id !== id && newArray.push(obj);
+      obj.id !== id && comments.push(obj);
     });
     this.setState({
-      comments: newArray
+      comments
     });
-    storage.setItem("comments", JSON.stringify(newArray));
-
-    onPeopleCountChange && onPeopleCountChange(newArray);
+    storage.setItem('comments', JSON.stringify(comments));
+    onPeopleCountChange && onPeopleCountChange(comments);
   };
 
   handleEdit = id => {
@@ -175,27 +141,27 @@ export class Main extends Component {
     this.setState({
       comments: this.state.comments
     });
-    storage.setItem("comments", JSON.stringify(this.state.comments));
+    storage.setItem('comments', JSON.stringify(this.state.comments));
     this.setCommentLoadingDone();
   };
 
   render() {
     let { comments, submitting, value, name, imageUrl, loading} = this.state;
     return (
-      <div className="Main">
+      <div className='Main'>
         <Comment
           avatar={
             <Upload
-              name="avatar"
-              className="avatar-uploader"
+              name='avatar'
+              className='avatar-uploader'
               showUploadList={false}
-              action="https://www.mocky.io/v2/5185415ba171ea3a00704eed"
+              action='https://www.mocky.io/v2/5185415ba171ea3a00704eed'
               onChange={this.handleChangeImg}
             >
               {loading ? (
-                <Icon type="loading" />
+                <Icon type='loading' />
               ) : (
-                <Avatar src={imageUrl} alt="Han Solo" />
+                <Avatar src={imageUrl} alt='Han Solo' />
               )}
             </Upload>
           }
