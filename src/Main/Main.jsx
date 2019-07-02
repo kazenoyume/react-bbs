@@ -25,8 +25,7 @@ const contentObj = (
   time,
   isEdit,
   onLoading
-) => {
-  return {
+) => ({
     id: id,
     author: author,
     avatar: avatar,
@@ -35,10 +34,10 @@ const contentObj = (
     isEdit: isEdit || false,
     time: time,
     onLoading: onLoading || false
-  };
-};
+  });
 
-let storage = window.localStorage;
+
+const storage = window.localStorage;
 export class Main extends Component {
   static contextType = AppContext;
   state = {
@@ -63,7 +62,7 @@ export class Main extends Component {
             obj.author,
             obj.avatar,
             obj.content,
-            `${moment.duration(moment(obj.time) - moment().unix(), "ms").humanize()} ago`,
+            `${moment.duration(moment(obj.time) - moment().unix(), "seconds").humanize()} ago`,
             obj.time,
             false,
             true
@@ -78,16 +77,16 @@ export class Main extends Component {
   }
 
 
-  setCommentLoadingDone = (time) => {
+  setCommentLoadingDone = (time) => 
     setTimeout(time => {
-      this.state.comments.forEach(obj => {
-        obj.onLoading = false;
-      });
-      this.setState({
-        comments: this.state.comments
-      });
-    }, time||1000);
-  };
+        this.state.comments.forEach(obj => {
+          obj.onLoading = false;
+        });
+        this.setState({
+          comments: this.state.comments
+        });
+      }, time||1000);
+
 
   handleSubmit = () => {
     const { onPeopleCountChange } = this.context;
@@ -121,15 +120,9 @@ export class Main extends Component {
     }, 1000);
   };
 
-  handleChange = ({target:{value}}) =>  (this.setState({ value: value })) ;
-
-  handleChangeName = ({target:{value}}) => {
-    storage.setItem("name", value);
-    this.setState({
-      name: value
-    });
-  };
-
+  handleChange = ({target:{value}}) =>  this.setState({ value: value }) ;
+  handleChangeName = ({target:{value}}) => ((storage.setItem("name", value)),( this.setState({ name: value })))
+ 
   handleChangeImg = info => {
     if (info.file.status === "uploading") {
       this.setState({ loading: true });
@@ -148,6 +141,7 @@ export class Main extends Component {
   };
 
   handleDelete = id => {
+    const { onPeopleCountChange } = this.context;
     let newArray = [];
     this.state.comments.forEach(obj => {
       obj.id !== id && newArray.push(obj);
@@ -156,7 +150,7 @@ export class Main extends Component {
       comments: newArray
     });
     storage.setItem("comments", JSON.stringify(newArray));
-    const { onPeopleCountChange } = this.context;
+
     onPeopleCountChange && onPeopleCountChange(newArray);
   };
 
@@ -186,7 +180,7 @@ export class Main extends Component {
   };
 
   render() {
-    let { comments, submitting, value, name, imageUrl } = this.state;
+    let { comments, submitting, value, name, imageUrl, loading} = this.state;
     return (
       <div className="Main">
         <Comment
@@ -198,7 +192,7 @@ export class Main extends Component {
               action="https://www.mocky.io/v2/5185415ba171ea3a00704eed"
               onChange={this.handleChangeImg}
             >
-              {this.state.loading ? (
+              {loading ? (
                 <Icon type="loading" />
               ) : (
                 <Avatar src={imageUrl} alt="Han Solo" />

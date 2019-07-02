@@ -7,32 +7,15 @@ const { TextArea } = Input;
 export class CommentObj extends Component {
   static contextType = MainContext;
   state = {
-    editMsg: ""
+    editMsg: "",
+    ... this.context
   };
 
-  ondelete(id){
-    const { onDelete } = this.context;
-    onDelete && onDelete(id);
-  };
-  onmodify = (id, content) => {
-    const { onEdit } = this.context;
-    onEdit && onEdit(id);
-    this.setState({
-      editMsg: content
-    });
-  };
-  onsave = id => {
-    const { onSave } = this.context;
-    onSave && onSave(id, this.state.editMsg);
-  };
-  onTextChange = e => {
-    const {
-      target: { value }
-    } = event;
-    this.setState({
-      editMsg: value
-    });
-  };
+  ondelete = id => this.state.onDelete &&  this.state.onDelete(id);
+  onmodify = (id, content) => ((this.state.onEdit &&  this.state.onEdit(id)),(this.setState({ editMsg: content })));
+  onsave = id => this.state.onSave && this.state.onSave(id, this.state.editMsg);
+  onTextChange = ({target:{value}}) => this.setState({ editMsg: value });
+
   render() {
     let { comment } = this.props;
     let { editMsg } = this.state;
