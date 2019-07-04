@@ -44,8 +44,11 @@ export class Main extends Component {
       const { onPeopleCountChange } = this.context;
       onPeopleCountChange && onPeopleCountChange(comment);
     }
-  
+    window.onbeforeunload = (e) => {
+      console.log('onbeforeunload')
+    }; 
   }
+  
   setCommentLoadingDone = (time) => 
     setTimeout(time => {
         this.state.comments.forEach(obj => {

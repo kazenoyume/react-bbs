@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Comment, Input, Tooltip, Skeleton, Popconfirm } from "antd";
 import moment from "moment";
 
+
 import { MainContext } from "../Main/context";
 const { TextArea } = Input;
 
@@ -9,12 +10,11 @@ export class CommentObj extends Component {
   static contextType = MainContext;
   state = {
     editMsg: "",
-    ...this.context
   };
-
-  ondelete      = id => this.state.onDelete &&  this.state.onDelete(id);
-  onmodify      = (id, content) => ((this.state.onEdit &&  this.state.onEdit(id)),(this.setState({ editMsg: content })));
-  onsave        = id => this.state.onSave && this.state.onSave(id, this.state.editMsg);
+  
+  ondelete      = id => this.context.onDelete &&  this.context.onDelete(id);
+  onmodify      = (id, content) => ((this.context.onEdit &&  this.context.onEdit(id)),(this.setState({ editMsg: content })));
+  onsave        = id => this.context.onSave && this.context.onSave(id, this.state.editMsg);
   onTextChange  = ({target:{value}}) => this.setState({ editMsg: value });
   displayTime   = time =>`${moment.duration(moment(time) - moment().unix(), "seconds").humanize()} ago`;
 
@@ -48,8 +48,7 @@ export class CommentObj extends Component {
         datetime={
           <div>
             <Tooltip title={time}>
-              {" "}
-              <span>{this.displayTime(time)}</span>{" "}
+              <span>{this.displayTime(time)}</span>
             </Tooltip>
             <Popconfirm
               title="Are you sure delete this?"
@@ -57,8 +56,7 @@ export class CommentObj extends Component {
               okText="Yes"
               cancelText="No"
             >
-              {" "}
-              <a>Delete</a>{" "}
+              <a>Delete</a>
             </Popconfirm>
           </div>
         }
