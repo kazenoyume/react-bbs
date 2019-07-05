@@ -44,12 +44,9 @@ export class Main extends Component {
       const { onPeopleCountChange } = this.context;
       onPeopleCountChange && onPeopleCountChange(comment);
     }
-    window.onbeforeunload = (e) => {
-      console.log('onbeforeunload')
-    }; 
   }
   
-  setCommentLoadingDone = (time) => 
+  setCommentLoadingDone = (time = 1000) => 
     setTimeout(time => {
         this.state.comments.forEach(obj => {
           obj.onLoading = false;
@@ -57,7 +54,7 @@ export class Main extends Component {
         this.setState({
           comments: this.state.comments
         });
-      }, time||1000);
+      }, time );
 
 
   handleSubmit = () => {
@@ -94,18 +91,12 @@ export class Main extends Component {
   handleChange = ({target:{value}}) =>  this.setState({ value: value }) ;
   handleChangeName = ({target:{value}}) => ((storage.setItem('name', value)),( this.setState({ name: value })))
  
-  handleChangeImg = info => {
-    if (info.file.status === 'uploading') {
-      this.setState({ loading: true });
-      return;
-    }
-    if (info.file.status === 'done') {
-      // Get this url from response in real world.
-      getBase64(info.file.originFileObj, imageUrl => {
+  handleChangeImg = ({file:{status, originFileObj:file}}) => {
+    (status === 'uploading') && this.setState({ loading: true });
+    (status === 'done') && getBase64(file, imageUrl => {
           storage.setItem('imageUrl', imageUrl);
           this.setState({ imageUrl, loading: false});
       });
-    }
   };
 
   handleDelete = id => {
@@ -123,7 +114,7 @@ export class Main extends Component {
 
   handleEdit = id => {
     this.state.comments.forEach(obj => {
-      obj.isEdit = obj.id === id ? true : false;
+      obj.isEdit = (obj.id === id);
     });
     this.setState({
       comments: this.state.comments
