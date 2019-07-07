@@ -5,7 +5,6 @@ import moment from "moment";
 
 import { MainContext } from "../Main/context";
 const { TextArea } = Input;
-
 export class CommentObj extends Component {
   static contextType = MainContext;
   state = {
@@ -13,9 +12,9 @@ export class CommentObj extends Component {
   };
   
   ondelete      = id => this.context.onDelete &&  this.context.onDelete(id);
-  onmodify      = (id, content) => ((this.context.onEdit &&  this.context.onEdit(id)),(this.setState({ editMsg: content })));
+  onmodify      = (id, content) => ((this.context.onEdit &&  this.context.onEdit(id)),(this.setState({ editMsg: content }))));
   onsave        = id => this.context.onSave && this.context.onSave(id, this.state.editMsg);
-  onTextChange  = ({target:{value}}) => this.setState({ editMsg: value });
+  onTextChange  = ({target:{value}}) => {this.setState({ editMsg: value }); editMsg2= value; };
   displayTime   = time =>`${moment.duration(moment(time) - moment().unix(), "seconds").humanize()} ago`;
 
   render() {
