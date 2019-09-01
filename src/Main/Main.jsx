@@ -9,7 +9,7 @@ import { Editor } from '../Editor';
 import { CommentList } from '../CommentList';
 import { AppContext } from '../App/context';
 import { MainContext } from './context';
-
+import { withCookies } from 'react-cookie'
 const getBase64 = (img, callback) => {
   const reader = new FileReader();
   reader.addEventListener('load', () => callback(reader.result));
@@ -19,7 +19,7 @@ const getBase64 = (img, callback) => {
 
 
 const storage = window.localStorage;
-export class Main extends Component {
+class Main extends Component {
   static contextType = AppContext;
   state = {
     loading: false,
@@ -32,6 +32,7 @@ export class Main extends Component {
 
 
   componentDidMount() {
+     console.log(12345)
     if (storage.getItem('comments')) {
       let comment = JSON.parse(storage.getItem('comments'));
       comment.forEach(obj => {
@@ -181,3 +182,5 @@ export class Main extends Component {
     );
   }
 }
+
+export default withCookies(Main)

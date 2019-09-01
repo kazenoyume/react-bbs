@@ -1,11 +1,18 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import 'antd/dist/antd.css';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { BrowserRouter } from 'react-router-dom'
+import { CookiesProvider } from 'react-cookie'
+import 'antd/dist/antd.css'
 
-import './index.css';
-import { App } from './App';
+import './index.css'
+import { App } from './App'
+
 
 ReactDOM.render(
-  <App />,
+  <BrowserRouter>
+    <CookiesProvider>
+      <App />
+    </CookiesProvider>
+  </BrowserRouter>,
   document.getElementById('root')
-);
+)

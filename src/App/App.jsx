@@ -1,11 +1,15 @@
 import React, { Component } from "react";
 import logo from "./styles/logo.svg";
 import "./styles/App.css";
-
-import { Main } from "../Main";
+import { Route, Switch, Link } from 'react-router-dom'
+import Main from "../Main";
+import {Cookies} from 'react-cookie';
 import { AppContext } from "./context";
+import PrivateRoute from '../PrivateRoute'
+import { Menu } from 'antd'
+import Login from '../Login'
 
-export class App extends Component {
+export class App extends React.Component {
   state = {
     peopleCount: 0
   };
@@ -13,21 +17,23 @@ export class App extends Component {
   render() {
     let { peopleCount } = this.state;
     return (
-      <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <span>馬的留言人數：{peopleCount}人</span>
+          <div>
+          <Menu mode="horizontal">
+            <Menu.Item>
+              <Link to="/">Main</Link>
+            </Menu.Item>
+            <Menu.Item>
+              {
+                 (new Cookies().get('userID'))?(<Link to="/login">Logout </Link>):(<Link to="/login">Login </Link>)
+              }
+    
+          </Menu.Item>
+          </Menu>
+          <Switch>
+            <PrivateRoute path="/login" component={Login} />
+            <PrivateRoute path="/" component={Main} />
+          </Switch>
         </div>
-        <div className="App-body">
-          <AppContext.Provider
-            value={{
-              onPeopleCountChange: this.setPeopleCountChange
-            }}
-          >
-            <Main />
-          </AppContext.Provider>
-        </div>
-      </div>
     );
   }
 
